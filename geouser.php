@@ -12,32 +12,13 @@ add_action( 'admin_enqueue_scripts', 'geouser_scripts' );
 
 function geouser_scripts() {
 
-    global $pagenow;
-
-    if ( !in_array( $pagenow, array( 'profile.php', 'user-edit.php' ) ) )
+    if ( empty( $_SERVER['SCRIPT_NAME'] ) ||
+        !in_array( $_SERVER['SCRIPT_NAME'],
+        array( '/wp-admin/profile.php', '/wp-admin/user-edit.php' ) ) )
         return false;
 
     wp_enqueue_script( 'google-maps-v3', 'http://maps.google.com/maps/api/js?sensor=false' );
     wp_enqueue_script( 'geouser', plugins_url( '/geouser.js', __FILE__ ) );
-
-    $params = array();
-
-    if ( !empty( $_GET['user_id'] ) && intval( $_GET['user_id'] ) ) {
-        $params['lat'] = get_user_meta( $_GET['user_id'], 'lat', true );
-        $params['lng'] = get_user_meta( $_GET['user_id'], 'lng', true );
-    }
-
-    if ( !defined( 'GEOUSER_INITIAL_LAT' ) || !GEOUSER_INITIAL_LAT
-        || !defined( 'GEOUSER_INITIAL_LNG' ) || !GEOUSER_INITIAL_LNG ) {
-        // Brazil
-        define( 'GEOUSER_INITIAL_LAT', -15 );
-        define( 'GEOUSER_INITIAL_LNG', -55 );
-    }
-
-    $params['initial_lat'] = GEOUSER_INITIAL_LAT;
-    $params['initial_lng'] = GEOUSER_INITIAL_LNG;
-
-    wp_localize_script( 'geouser', 'geouser', $params );
 
 }
 
@@ -51,10 +32,9 @@ function geouser_fields( $user ) {
     <tr>
     <th><label for="address"><?php _e( 'Pin your location in the map', 'geouser' ); ?></label></th>
     <td>
-    <p>Search address: <input type="text" id="geouser-search" class="regular-text" /></p>
-    <div id="geouser-map" style="display:block; width:500px; height: 300px; border: 1px solid #DFDFDF;"></div>
-    <input type="hidden" id="geouser-lat" name="lat" value="<?php echo get_user_meta( $user->ID, 'lat', true ); ?>" />
-    <input type="hidden" id="geouser-lng" name="lng" value="<?php echo get_user_meta( $user->ID, 'lng', true ); ?>" />
+    <div id="geouser-map" style="display:block; width:500px; height: 300px"></div>
+    <input type="hidden" name="lat" value="<?php echo get_user_meta( $user, 'lat' ); ?>" />
+    <input type="hidden" name="lng" value="<?php echo get_user_meta( $user, 'lng' ); ?>" />
     </td>
     </tr>
     </table>

@@ -71,7 +71,7 @@ function geouser_save( $user_id ) {
 
     if ( !empty( $_POST['lat'] ) && floatval( $_POST['lat'] )
         && !empty( $_POST['lng'] ) && floatval( $_POST['lng'] ) ) {
-        echo update_user_meta( $user_id, 'location', array( $_POST['lat'], $_POST['lng'] ) );
+        update_user_meta( $user_id, 'location', array( $_POST['lat'], $_POST['lng'] ) );
     }
 
 }

@@ -10,8 +10,8 @@ if (!_map.length)
     return false;
 
 var initial_center;
-if (geouser.lat && geouser.lng) {
-    initial_center = new google.maps.LatLng(geouser.lat, geouser.lng);
+if (_lat.val() && _lng.val()) {
+    initial_center = new google.maps.LatLng(_lat.val(), _lng.val());
     initial_zoom = 16;
 } else {
     initial_center = new google.maps.LatLng(geouser.initial_lat, geouser.initial_lng);
@@ -26,7 +26,7 @@ var options = {
     mapTypeControl: false,
     panControl: false,
     streetViewControl: false,
-    zoomControlOptions: {style: google.maps.ZoomControlStyle.SMALL }
+    zoomControlOptions: { style: google.maps.ZoomControlStyle.SMALL }
 };
 
 var map = new google.maps.Map(document.getElementById(_map_id), options);
@@ -34,7 +34,7 @@ var geocoder = new google.maps.Geocoder();
 var marker;
 
 google.maps.event.addDomListener(window, 'load', function(e) {
-    if (!initial_center)
+    if (!_lat.val() || !_lng.val())
         return false;
     marker = new google.maps.Marker({
         map: map,

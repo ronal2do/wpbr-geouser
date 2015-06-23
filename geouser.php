@@ -136,7 +136,8 @@ function geouser_fields( $user ) {
     <?php $map_table .= '</td>';?>
     <?php $map_table .= '</tr>';?>
     <?php $map_table .= '</table>';?>
-    <?php echo apply_filters('geouser_map_pins',$map_table); ?>
+    <?php $map_table = apply_filters('geouser_map_pins', array('html' => $map_table, 'user' => $user->ID)); ?>
+    <?php echo $map_table['html'];?>
 <?php }
 
 add_action( 'personal_options_update', 'geouser_save' );
@@ -151,6 +152,7 @@ function geouser_save( $user_id ) {
         && !empty( $_POST['lng'] ) && floatval( $_POST['lng'] ) ) {
         $pin = (!empty($_POST['geouser-pin'])) ? $_POST['geouser-pin'] : null;
         update_user_meta( $user_id, 'location', array( $_POST['lat'], $_POST['lng'], $pin ) );
+        do_action('geouser_save',$user_id);
     }
 
 }

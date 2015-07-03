@@ -152,7 +152,7 @@ function geouser_save( $user_id ) {
         && !empty( $_POST['lng'] ) && floatval( $_POST['lng'] ) ) {
         $pin = (!empty($_POST['geouser-pin'])) ? $_POST['geouser-pin'] : null;
         update_user_meta( $user_id, 'location', array( $_POST['lat'], $_POST['lng'], $pin ) );
-        do_action('geouser_save',$user_id);
     }
+    do_action('geouser_save',$user_id);
 
 }

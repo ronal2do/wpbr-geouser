@@ -129,8 +129,7 @@ if ( ! class_exists('GeoUser') ) :
             if ( !in_array( $pagenow, array( 'profile.php', 'user-edit.php' ) ) )
                 return false;
 
-            // wp_enqueue_script( 'google-maps-v3', '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&language=pt_br' );
-            wp_enqueue_script( 'google-maps-v3', 'http://maps.google.com/maps/api/js?sensor=false' );
+            wp_enqueue_script( 'google-maps-v3', '//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&language=pt_br' );
             wp_enqueue_script( 'geouser', $this->plugin_url . 'js/geouser.js' );
 
             $params_1 = array(
@@ -143,19 +142,19 @@ if ( ! class_exists('GeoUser') ) :
 
         /**
          * Fetches the users to put on the map with the required information
+         * This method will be used when the wpbr-mapa is integraded with GeoUser plugin
          *
          * @since GeoUser (1.0)
          *
          * @uses get_transient()
          * @uses set_transient()
-         * @uses bp_get_profile_field_data()
          * 
          * @return array An array of users
          */
         public function get_map_users() {
 
-            // if ( $users = get_transient( 'map_users' ) )
-                // return $users;
+            if ( $users = get_transient( 'map_users' ) )
+                return $users;
 
             $args = array(
                 'orderby'   => 'ID',
@@ -180,7 +179,7 @@ if ( ! class_exists('GeoUser') ) :
                     if ( empty( $loc[0] ) || empty( $loc[1] ) )
                         continue;
 
-                    $marker = !empty($loc[2]) ? get_stylesheet_directory_uri() . '/img/'.'pins/'.$loc[2].'.png' : $params['imgbase'] . 'marker.png';
+                    $marker = !empty($loc[2]) ? get_stylesheet_directory_uri() . '/img/' . 'pins/' . $loc[2] . '.png' : $params['imgbase'] . 'marker.png';
 
                     $users[] = array(
                         'ID'                => $user_id,
@@ -193,13 +192,14 @@ if ( ! class_exists('GeoUser') ) :
                 }
             }
 
-            // set_transient( 'map_users', $users, 3600 * 24 );
+            set_transient( 'map_users', $users, 3600 * 24 );
 
             return $users;
         }
 
         /**
          * Outputs the total number of users fetching by the location metadata
+         * Right here I just want the total number to be used here https://github.com/wpbrasil/wpbr-mapa/issues/7
          *
          * @since GeoUser (1.0)
          *
@@ -254,6 +254,8 @@ if ( ! class_exists('GeoUser') ) :
         /**
          * Outputs the needed fields in user profile page
          *
+         * @todo Clean it
+         *
          * @since GeoUser (1.0)
          *
          * @return string
@@ -265,8 +267,7 @@ if ( ! class_exists('GeoUser') ) :
                 $location['lat'] = $loc[0];
                 $location['lng'] = $loc[1];
                 $location['type'] = $loc[2];
-            }
-            ?>
+            } ?>
             <?php $map_table = ''; ?>
             <?php $map_table .= '<h3>'.__( "Geolocalization", "geouser" ).'</h3>'; ?>
             <?php $map_table .= '<table class="form-table">'; ?>
@@ -356,7 +357,7 @@ if ( ! class_exists('GeoUser') ) :
             <?php $map_table .= '</td>';?>
             <?php $map_table .= '</tr>';?>
             <?php $map_table .= '</table>';?>
-            <?php $map_table = apply_filters('geouser_map_pins', array('html' => $map_table, 'user' => $user->ID)); ?>
+            <?php $map_table = apply_filters('geouser_map_pins', array('html' => $map_table, 'user' => $user->ID ) ); ?>
             <?php echo $map_table['html']; ?>
         <?php }
 
@@ -364,9 +365,6 @@ if ( ! class_exists('GeoUser') ) :
          * Saves the GeoUser Informantion in the user metadata
          *
          * @since GeoUser (1.0)
-         *
-         * @param $field_id int ID of a saved field
-         * @param $value string New value of a field
          * 
          * @return bool
          */
@@ -387,8 +385,8 @@ if ( ! class_exists('GeoUser') ) :
             // Updates user with GeoUser info
             do_action('geouser_save', $user_id);
             
-            // Deletes the GeoUser Transient
-            // delete_transient( 'map_users' );
+            // Deletes the GeoUser transient
+            delete_transient( 'map_users' );
         }
     }
 endif;
